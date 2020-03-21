@@ -1,0 +1,66 @@
+﻿@model IEnumerable<MunitionStockAndSupply.Models.Inventory>
+
+@{
+    ViewData["Title"] = "Inventory";
+}
+
+<h1>Inventory</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ItemName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsItemRestricted)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ItemPrice)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ItemName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.IsItemRestricted)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ItemPrice)
+                </td>
+                <td>
+                    @Html.ActionLink("Add To Cart", "AddToCart", new { itemName = item.ItemName, itemPrice = item.ItemPrice })
+                    <input type="button" onclick="addToCart('@item.ItemName', '@item.ItemPrice')" value="Add To Cart" />
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<script>
+    function addToCart(itemName, itemPrice) {
+
+        $.ajax({
+            type: "POST",
+            url: "/Home/AddToCart",
+            data:
+            {
+                "itemName": itemName,
+                "itemPrice": itemPrice
+            },
+            dataType: "json",
+            success: function (response) {
+                alert("Success")
+            },
+            failure: function (response) {
+                alert(response.responseText);
+            }
+        });
+    }
+</script>

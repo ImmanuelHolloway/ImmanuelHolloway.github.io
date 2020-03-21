@@ -1,0 +1,49 @@
+﻿@model IEnumerable<MunitionStockAndSupply.Models.Cart>
+
+@{
+    ViewData["Title"] = "Cart";
+    string formatPrice = "";
+    float total = 0;
+}
+
+<h1>Shopping Cart</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ItemName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ItemPrice)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            formatPrice = item.ItemPrice.Trim('$');
+            total += float.Parse(formatPrice);
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ItemName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ItemPrice)
+                </td>
+                <td>
+                    <!--SK: Need to come back to this-->
+                    @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+                </td>
+            </tr>
+        }
+    </tbody>
+    <p>
+        Total: $@total
+    </p>
+    <p>
+        <!--SK: Need to come back to this-->
+        <a asp-action="Checkout">Checkout</a>
+    </p>
+</table>

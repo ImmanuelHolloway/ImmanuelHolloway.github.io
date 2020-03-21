@@ -4,7 +4,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using MunitionStockAndSupply.Data.Contexts;
 using MunitionStockAndSupply.Models;
 
 namespace MunitionStockAndSupply.Controllers
@@ -12,10 +14,15 @@ namespace MunitionStockAndSupply.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly InventoryDbContext _inventoryContext;
+        private readonly CartDbContext _cartContext;
 
-        public HomeController(ILogger<HomeController> logger)
+
+        public HomeController(ILogger<HomeController> logger, InventoryDbContext inventorContext, CartDbContext cartContext)
         {
             _logger = logger;
+            _inventoryContext = inventorContext;
+            _cartContext = cartContext;
         }
 
         public IActionResult Index()
@@ -26,6 +33,49 @@ namespace MunitionStockAndSupply.Controllers
         public IActionResult Privacy()
         {
             return View();
+        }
+
+        public async Task<IActionResult> Inventory()
+        {
+            try
+            {
+                return View(await _inventoryContext.Inventory.ToListAsync());
+            }
+            catch(Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<IActionResult> Cart()
+        {
+            try
+            {
+                return View(await _cartContext.Cart.ToListAsync());
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task AddToCart(string itemName, string itemPrice)
+        {
+            try
+            {
+                Cart item = new Cart()
+                {
+                    ItemName = itemName,
+                    ItemPrice = itemPrice
+                };
+
+                await _cartContext.AddAsync(item);
+                await _cartContext.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
