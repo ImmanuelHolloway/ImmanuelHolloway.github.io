@@ -59,14 +59,15 @@ namespace MunitionStockAndSupply.Controllers
             }
         }
 
-        public async Task AddToCart(string itemName, string itemPrice)
+        public async Task AddToCart(string itemName, string itemPrice, int sellerID)
         {
             try
             {
                 Cart item = new Cart()
                 {
                     ItemName = itemName,
-                    ItemPrice = itemPrice
+                    ItemPrice = itemPrice,
+                    SellerID = sellerID
                 };
 
                 await _cartContext.AddAsync(item);
