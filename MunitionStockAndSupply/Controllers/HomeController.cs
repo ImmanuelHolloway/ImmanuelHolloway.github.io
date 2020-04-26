@@ -59,6 +59,11 @@ namespace MunitionStockAndSupply.Controllers
             }
         }
 
+        public async Task<IActionResult> Checkout()
+        {
+            return View();
+        }
+
         public async Task AddToCart(string itemName, string itemPrice, int sellerID)
         {
             try
