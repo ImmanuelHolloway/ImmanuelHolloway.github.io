@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MunitionStockAndSupply.Data.Contexts;
@@ -16,13 +17,14 @@ namespace MunitionStockAndSupply.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly InventoryDbContext _inventoryContext;
         private readonly CartDbContext _cartContext;
+        private readonly CheckoutDbContext _checkoutContext;
 
-
-        public HomeController(ILogger<HomeController> logger, InventoryDbContext inventorContext, CartDbContext cartContext)
+        public HomeController(ILogger<HomeController> logger, InventoryDbContext inventorContext, CartDbContext cartContext, CheckoutDbContext checkoutContext)
         {
             _logger = logger;
             _inventoryContext = inventorContext;
             _cartContext = cartContext;
+            _checkoutContext = checkoutContext;
         }
 
         public IActionResult Index()
@@ -59,8 +61,9 @@ namespace MunitionStockAndSupply.Controllers
             }
         }
 
-        public async Task<IActionResult> Checkout()
+        public async Task<IActionResult> Checkout(Checkout checkout)
         {
+            //if (checkout)
             return View();
         }
 
@@ -87,11 +90,40 @@ namespace MunitionStockAndSupply.Controllers
         public async Task<IActionResult> DeleteFromCart(int id)
         {
             var itemToDelete = await GetItemById(id);
-
-            _cartContext.Remove(itemToDelete);
-            await _cartContext.SaveChangesAsync();
+            
+            try
+            {
+                _cartContext.Remove(itemToDelete);
+                await _cartContext.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
 
             return View("Cart", await _cartContext.Cart.ToListAsync());
+        }
+
+        public async Task<IActionResult> Payment(Checkout paymentInformation)
+        {
+            try
+            {
+                await _checkoutContext.AddAsync(paymentInformation);
+                await _checkoutContext.SaveChangesAsync();
+
+                var clearCart = await _cartContext.Cart.ToListAsync();
+                foreach (var item in clearCart)
+                {
+                    _cartContext.Remove(item);
+                }
+                await _cartContext.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                return Error();
+            }
+
+            return View("ThankYou");
         }
 
         public async Task<Cart> GetItemById(int id)
