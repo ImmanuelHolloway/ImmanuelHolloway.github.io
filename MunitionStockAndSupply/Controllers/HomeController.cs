@@ -79,6 +79,19 @@ namespace MunitionStockAndSupply.Controllers
             }
         }
 
+        public async Task<IActionResult> DeleteFromCart(int id)
+        {
+            var itemToDelete = await GetItemById(id);
+
+            _cartContext.Remove(itemToDelete);
+            await _cartContext.SaveChangesAsync();
+
+            return View("Cart", await _cartContext.Cart.ToListAsync());
+        }
+
+        public async Task<Cart> GetItemById(int id)
+            => await _cartContext.Cart.FindAsync(id);
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

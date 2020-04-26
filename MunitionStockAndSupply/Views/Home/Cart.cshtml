@@ -33,8 +33,7 @@
                     @Html.DisplayFor(modelItem => item.ItemPrice)
                 </td>
                 <td>
-                    <!--SK: Need to come back to this-->
-                    @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+                    @Html.ActionLink("Delete", "DeleteFromCart", new {  id=item.Id  })
                 </td>
             </tr>
         }
