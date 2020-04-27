@@ -63,7 +63,6 @@ namespace MunitionStockAndSupply.Controllers
 
         public async Task<IActionResult> Checkout(Checkout checkout)
         {
-            //if (checkout)
             return View();
         }
 
@@ -120,7 +119,8 @@ namespace MunitionStockAndSupply.Controllers
             }
             catch (Exception ex)
             {
-                return Error();
+                //If not all information is filled out leave the customer on the checkout page.
+                return View("Checkout");
             }
 
             return View("ThankYou");
