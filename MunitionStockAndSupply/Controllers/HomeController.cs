@@ -107,32 +107,32 @@ namespace MunitionStockAndSupply.Controllers
         {
             try
             {
-                await _checkoutContext.AddAsync(paymentInformation);
-                await _checkoutContext.SaveChangesAsync();
-
-                var clearCart = await _cartContext.Cart.ToListAsync();
-                foreach (var item in clearCart)
+                if (ModelState.IsValid)
                 {
-                    _cartContext.Remove(item);
+                    await _checkoutContext.AddAsync(paymentInformation);
+                    await _checkoutContext.SaveChangesAsync();
+
+                    var clearCart = await _cartContext.Cart.ToListAsync();
+                    foreach (var item in clearCart)
+                    {
+                        _cartContext.Remove(item);
+                    }
+                    await _cartContext.SaveChangesAsync();
+
+                    return View("ThankYou");
                 }
-                await _cartContext.SaveChangesAsync();
+                else
+                {
+                    return View("Checkout");
+                }
             }
             catch (Exception ex)
             {
-                //If not all information is filled out leave the customer on the checkout page.
-                return View("Checkout");
+                throw ex;
             }
-
-            return View("ThankYou");
         }
 
         public async Task<Cart> GetItemById(int id)
             => await _cartContext.Cart.FindAsync(id);
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
     }
 }
