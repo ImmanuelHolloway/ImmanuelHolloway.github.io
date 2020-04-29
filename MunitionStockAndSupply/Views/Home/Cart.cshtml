@@ -1,4 +1,7 @@
 ﻿@model IEnumerable<MunitionStockAndSupply.Models.Cart>
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
 
 @{
     ViewData["Title"] = "Cart";
@@ -33,7 +36,7 @@
                     @Html.DisplayFor(modelItem => item.ItemPrice)
                 </td>
                 <td>
-                    @Html.ActionLink("Delete", "DeleteFromCart", new {  id=item.Id  })
+                    @Html.ActionLink("Delete", "DeleteFromCart", new { id = item.Id })
                 </td>
             </tr>
         }
@@ -41,7 +44,14 @@
     <p>
         Total: $@total
     </p>
-    <p>
-        @Html.ActionLink("Checkout", "Checkout")
-    </p>
+    @if (SignInManager.IsSignedIn(User))
+    {
+        <p>
+            @Html.ActionLink("Checkout", "Checkout")
+        </p>
+    }
+    else
+    {
+        <p>Please <a asp-area="Identity" asp-page="/Account/Login">Login Or Register</a> To Purchase Items.</p>
+    }
 </table>

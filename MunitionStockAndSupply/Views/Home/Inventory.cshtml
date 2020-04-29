@@ -1,4 +1,7 @@
 ﻿@model IEnumerable<MunitionStockAndSupply.Models.Inventory>
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
 
 @{
     ViewData["Title"] = "Inventory";
@@ -35,7 +38,14 @@
                     @Html.DisplayFor(modelItem => item.ItemPrice)
                 </td>
                 <td>
-                    <input type="button" onclick="addToCart('@item.ItemName', '@item.ItemPrice', '@item.SellerId')" value="Add To Cart" />
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+                        <input type="button" onclick="addToCart('@item.ItemName', '@item.ItemPrice', '@item.SellerId')" value="Add To Cart" />
+                    }
+                    else
+                    {
+                        <p>Please <a asp-area="Identity" asp-page="/Account/Login">Login Or Register</a> To Purchase Items.</p>
+                    }
                 </td>
             </tr>
         }

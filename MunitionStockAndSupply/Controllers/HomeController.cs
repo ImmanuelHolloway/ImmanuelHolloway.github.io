@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MunitionStockAndSupply.Data.Contexts;
@@ -43,7 +44,7 @@ namespace MunitionStockAndSupply.Controllers
             {
                 return View(await _inventoryContext.Inventory.ToListAsync());
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw ex;
             }
@@ -53,7 +54,7 @@ namespace MunitionStockAndSupply.Controllers
         {
             try
             {
-                return View(await _cartContext.Cart.ToListAsync());
+                return View(await _cartContext.Cart.Where(x => x.UserId == CurrentUser()).ToListAsync());
             }
             catch (Exception ex)
             {
@@ -72,6 +73,7 @@ namespace MunitionStockAndSupply.Controllers
             {
                 Cart item = new Cart()
                 {
+                    UserId = CurrentUser(),
                     ItemName = itemName,
                     ItemPrice = itemPrice,
                     SellerID = sellerID
@@ -88,19 +90,22 @@ namespace MunitionStockAndSupply.Controllers
 
         public async Task<IActionResult> DeleteFromCart(int id)
         {
-            var itemToDelete = await GetItemById(id);
-            
             try
             {
-                _cartContext.Remove(itemToDelete);
-                await _cartContext.SaveChangesAsync();
+                var itemToDelete = await GetItemById(id);
+
+                if (itemToDelete != null)
+                {
+                    _cartContext.Remove(itemToDelete);
+                    await _cartContext.SaveChangesAsync();
+                }
             }
             catch (Exception ex)
             {
                 throw ex;
             }
 
-            return View("Cart", await _cartContext.Cart.ToListAsync());
+            return View("Cart", await _cartContext.Cart.Where(x => x.UserId == CurrentUser()).ToListAsync());
         }
 
         public async Task<IActionResult> Payment(Checkout paymentInformation)
@@ -112,7 +117,7 @@ namespace MunitionStockAndSupply.Controllers
                     await _checkoutContext.AddAsync(paymentInformation);
                     await _checkoutContext.SaveChangesAsync();
 
-                    var clearCart = await _cartContext.Cart.ToListAsync();
+                    var clearCart = await _cartContext.Cart.Where(x => x.UserId == CurrentUser()).ToListAsync();
                     foreach (var item in clearCart)
                     {
                         _cartContext.Remove(item);
@@ -131,6 +136,9 @@ namespace MunitionStockAndSupply.Controllers
                 throw ex;
             }
         }
+
+        public string CurrentUser() 
+            => User.Identity.Name;
 
         public async Task<Cart> GetItemById(int id)
             => await _cartContext.Cart.FindAsync(id);
