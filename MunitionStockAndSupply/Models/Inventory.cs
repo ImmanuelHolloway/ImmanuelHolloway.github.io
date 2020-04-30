@@ -1,16 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
 
 namespace MunitionStockAndSupply.Models
 {
     public class Inventory
     {
         public int Id { get; set; }
+        [DisplayName("Products")]
         public string ItemName { get; set; }
+        [DisplayName("Restricted Status")]
         public bool IsItemRestricted { get; set; }
+        [DisplayName("Price")]
         public string ItemPrice { get; set; }
         public int? SellerId { get; set; }
     }

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
 
 namespace MunitionStockAndSupply.Models
 {
@@ -9,7 +6,9 @@ namespace MunitionStockAndSupply.Models
     {
         public int Id { get; set; }
         public string UserId { get; set; }
+        [DisplayName("Products")]
         public string ItemName { get; set; }
+        [DisplayName("Price")]
         public string ItemPrice { get; set; }
         public int SellerID { get; set; }
     }

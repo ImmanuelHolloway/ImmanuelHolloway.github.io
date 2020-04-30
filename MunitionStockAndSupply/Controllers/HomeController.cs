@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MunitionStockAndSupply.Data.Contexts;
@@ -54,6 +50,7 @@ namespace MunitionStockAndSupply.Controllers
         {
             try
             {
+                //Only return user specific items.
                 return View(await _cartContext.Cart.Where(x => x.UserId == CurrentUser()).ToListAsync());
             }
             catch (Exception ex)
@@ -64,7 +61,15 @@ namespace MunitionStockAndSupply.Controllers
 
         public async Task<IActionResult> Checkout(Checkout checkout)
         {
-            return View();
+            //Only allow checkout if user has items in their cart.
+            if (_cartContext.Cart.Where(x => x.UserId == CurrentUser()).Count() > 0)
+            {
+                return View();
+            }
+            else
+            {
+                return View("Cart", await _cartContext.Cart.Where(x => x.UserId == CurrentUser()).ToListAsync());
+            }
         }
 
         public async Task AddToCart(string itemName, string itemPrice, int sellerID)
@@ -117,6 +122,7 @@ namespace MunitionStockAndSupply.Controllers
                     await _checkoutContext.AddAsync(paymentInformation);
                     await _checkoutContext.SaveChangesAsync();
 
+                    //Only clear out items for the user checking out.
                     var clearCart = await _cartContext.Cart.Where(x => x.UserId == CurrentUser()).ToListAsync();
                     foreach (var item in clearCart)
                     {

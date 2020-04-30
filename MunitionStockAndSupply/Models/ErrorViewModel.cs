@@ -1,5 +1,3 @@
-using System;
-
 namespace MunitionStockAndSupply.Models
 {
     public class ErrorViewModel
